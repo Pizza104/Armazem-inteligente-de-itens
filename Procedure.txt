@@ -1,0 +1,58 @@
+// Isso aqui é para criar uma tabela tanto do cliente quanto do fornecedor, pelo o que eu entendi não precisa ainda do categoria
+
+CREATE DATABASE empresa;
+USE empresa;
+
+CREATE TABLE cliente (
+ id INT PRIMARY KEY AUTO_INCREMENT,
+ nome VARCHAR(100),
+ email VARCHAR(100)
+);
+
+CREATE TABLE fornecedor (
+ id INT PRIMARY KEY AUTO_INCREMENT,
+ nome VARCHAR(100),
+ cidade VARCHAR(100)
+);
+
+//Esse aqui é dentro da tabela clientes ou seja o que irá ser salvo ali dentro tá aqui
+
+DELIMITER $$
+
+CREATE PROCEDURE Lista_clientes()
+BEGIN
+ SELECT id, nome, email
+ FROM cliente;
+END $$
+
+DELIMITER ;
+
+// E por último, mas não menos importante esse aqui é para o Fornecedor 
+
+DELIMITER $$
+
+CREATE PROCEDURE lista_fornecedores()
+BEGIN
+ SELECT id, nome, cidade
+ FROM fornecedor;
+END $$
+
+DELIMITER ;
+
+// Aqui é para o teste de seleção que me foi pedido na aula, eu vou admitir que não lembrava todos os comandos então tive que pesquisar coisa ou outra, mas foi tudo pelo youtube
+
+INSERT INTO cliente(nome,email)
+VALUES
+('Ana','ana@email.com'),
+('Carlos','carlos@email.com');
+
+INSERT INTO fornecedor(nome,cidade)
+VALUES
+('Fornecedor A','Salto'),
+('Fornecedor B','Itu');
+
+CALL lista_clientes();
+CALL lista_fornecedores();
+
+SELECT * FROM cliente;
+SELECT * FROM fornecedor;
