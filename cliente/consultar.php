@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../Cliente.php';
+require_once '../Cliente.php';  // CORRETO
 
 $clientes = Cliente::listarTodos();
 ?>
@@ -22,7 +22,7 @@ $clientes = Cliente::listarTodos();
 
             <table class="table table-striped">
                 <thead>
-                    <tr><th>ID</th><th>Nome</th><th>E-mail</th><th>Telefone</th><th>Ações</th></tr>
+                    <tr><th>ID</th><th>Nome</th><th>E-mail</th><th>Ações</th</tr>
                 </thead>
                 <tbody>
                     <?php if (count($clientes) > 0): ?>
@@ -31,7 +31,6 @@ $clientes = Cliente::listarTodos();
                                 <td><?= htmlspecialchars($c['id']) ?></td>
                                 <td><?= htmlspecialchars($c['nome']) ?></td>
                                 <td><?= htmlspecialchars($c['email']) ?></td>
-                                <td><?= htmlspecialchars($c['telefone'] ?? '') ?></td>
                                 <td>
                                     <a href="#" class="btn btn-sm btn-warning disabled">✏️</a>
                                     <a href="#" class="btn btn-sm btn-danger disabled">🗑️</a>
@@ -39,7 +38,7 @@ $clientes = Cliente::listarTodos();
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <tr><td colspan="5">Nenhum cliente cadastrado.</td></tr>
+                        <tr><td colspan="4">Nenhum cliente cadastrado.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
