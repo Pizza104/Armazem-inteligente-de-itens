@@ -1,58 +1,51 @@
-// Isso aqui é para criar uma tabela tanto do cliente quanto do fornecedor, pelo o que eu entendi não precisa ainda do categoria
-
-CREATE DATABASE empresa;
+-- Criar banco e tabelas
+CREATE DATABASE IF NOT EXISTS empresa;
 USE empresa;
 
-CREATE TABLE cliente (
- id INT PRIMARY KEY AUTO_INCREMENT,
- nome VARCHAR(100),
- email VARCHAR(100)
+-- Tabela cliente (sem telefone)
+CREATE TABLE IF NOT EXISTS cliente (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE
 );
 
-CREATE TABLE fornecedor (
- id INT PRIMARY KEY AUTO_INCREMENT,
- nome VARCHAR(100),
- cidade VARCHAR(100)
+-- Tabela fornecedor
+CREATE TABLE IF NOT EXISTS fornecedor (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL,
+    cidade VARCHAR(100) NOT NULL
 );
 
-//Esse aqui é dentro da tabela clientes ou seja o que irá ser salvo ali dentro tá aqui
-
+-- Procedures
 DELIMITER $$
 
-CREATE PROCEDURE Lista_clientes()
+CREATE PROCEDURE sp_listar_clientes()
 BEGIN
- SELECT id, nome, email
- FROM cliente;
+    SELECT id, nome, email FROM cliente ORDER BY id DESC;
+END $$
+
+CREATE PROCEDURE sp_inserir_cliente(IN p_nome VARCHAR(100), IN p_email VARCHAR(100))
+BEGIN
+    INSERT INTO cliente (nome, email) VALUES (p_nome, p_email);
+END $$
+
+CREATE PROCEDURE sp_listar_fornecedores()
+BEGIN
+    SELECT id, nome, cidade FROM fornecedor ORDER BY id DESC;
+END $$
+
+CREATE PROCEDURE sp_inserir_fornecedor(IN p_nome VARCHAR(100), IN p_cidade VARCHAR(100))
+BEGIN
+    INSERT INTO fornecedor (nome, cidade) VALUES (p_nome, p_cidade);
 END $$
 
 DELIMITER ;
 
-// E por último, mas não menos importante esse aqui é para o Fornecedor 
+-- Dados de teste
+INSERT INTO cliente (nome, email) VALUES
+('Ana Silva', 'ana@email.com'),
+('Carlos Souza', 'carlos@email.com');
 
-DELIMITER $$
-
-CREATE PROCEDURE lista_fornecedores()
-BEGIN
- SELECT id, nome, cidade
- FROM fornecedor;
-END $$
-
-DELIMITER ;
-
-// Aqui é para o teste de seleção que me foi pedido na aula, eu vou admitir que não lembrava todos os comandos então tive que pesquisar coisa ou outra, mas foi tudo pelo youtube
-
-INSERT INTO cliente(nome,email)
-VALUES
-('Ana','ana@email.com'),
-('Carlos','carlos@email.com');
-
-INSERT INTO fornecedor(nome,cidade)
-VALUES
-('Fornecedor A','Salto'),
-('Fornecedor B','Itu');
-
-CALL lista_clientes();
-CALL lista_fornecedores();
-
-SELECT * FROM cliente;
-SELECT * FROM fornecedor;
+INSERT INTO fornecedor (nome, cidade) VALUES
+('Fornecedor A', 'Salto'),
+('Fornecedor B', 'Itu');
