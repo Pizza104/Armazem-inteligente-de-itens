@@ -1,0 +1,14 @@
+CREATE TABLE cliente (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(150) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    telefone VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE fornecedor (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    razao_social VARCHAR(180) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    telefone VARCHAR(30) NOT NULL
+);
+    
