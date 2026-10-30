@@ -1,51 +1,66 @@
--- Criar banco e tabelas
-CREATE DATABASE IF NOT EXISTS empresa;
+-- Instalação do Armazém Inteligente (MySQL 8+ / MariaDB compatível)
+-- Execute este arquivo com um usuário autorizado a criar o banco.
+-- IDs signed INT preservam compatibilidade com cliente/fornecedor do esquema original.
+CREATE DATABASE IF NOT EXISTS empresa
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
 USE empresa;
 
--- Tabela cliente (sem telefone)
 CREATE TABLE IF NOT EXISTS cliente (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE
-);
+  id INT NOT NULL AUTO_INCREMENT,
+  nome VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_cliente_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Tabela fornecedor
 CREATE TABLE IF NOT EXISTS fornecedor (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(100) NOT NULL,
-    cidade VARCHAR(100) NOT NULL
-);
+  id INT NOT NULL AUTO_INCREMENT,
+  nome VARCHAR(100) NOT NULL,
+  cidade VARCHAR(100) NOT NULL,
+  PRIMARY KEY (id),
+  KEY idx_fornecedor_nome (nome)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Procedures
-DELIMITER $$
+CREATE TABLE IF NOT EXISTS categoria (
+  id INT NOT NULL AUTO_INCREMENT,
+  nome VARCHAR(80) NOT NULL,
+  descricao VARCHAR(255) NULL,
+  criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_categoria_nome (nome)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE PROCEDURE sp_listar_clientes()
-BEGIN
-    SELECT id, nome, email FROM cliente ORDER BY id DESC;
-END $$
+CREATE TABLE IF NOT EXISTS produto (
+  id INT NOT NULL AUTO_INCREMENT,
+  nome VARCHAR(150) NOT NULL,
+  sku VARCHAR(60) NULL,
+  categoria_id INT NULL,
+  fornecedor_id INT NULL,
+  quantidade INT UNSIGNED NOT NULL DEFAULT 0,
+  estoque_minimo INT UNSIGNED NOT NULL DEFAULT 5,
+  custo DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_produto_sku (sku),
+  KEY idx_produto_categoria (categoria_id),
+  KEY idx_produto_fornecedor (fornecedor_id),
+  KEY idx_produto_estoque (quantidade, estoque_minimo),
+  CONSTRAINT fk_produto_categoria FOREIGN KEY (categoria_id) REFERENCES categoria (id) ON UPDATE CASCADE ON DELETE SET NULL,
+  CONSTRAINT fk_produto_fornecedor FOREIGN KEY (fornecedor_id) REFERENCES fornecedor (id) ON UPDATE CASCADE ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE PROCEDURE sp_inserir_cliente(IN p_nome VARCHAR(100), IN p_email VARCHAR(100))
-BEGIN
-    INSERT INTO cliente (nome, email) VALUES (p_nome, p_email);
-END $$
+CREATE TABLE IF NOT EXISTS movimentacao_estoque (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  produto_id INT NOT NULL,
+  tipo ENUM('entrada', 'saida') NOT NULL,
+  quantidade INT UNSIGNED NOT NULL,
+  observacao VARCHAR(255) NULL,
+  criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_movimentacao_produto_data (produto_id, criado_em),
+  CONSTRAINT fk_movimentacao_produto FOREIGN KEY (produto_id) REFERENCES produto (id) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE PROCEDURE sp_listar_fornecedores()
-BEGIN
-    SELECT id, nome, cidade FROM fornecedor ORDER BY id DESC;
-END $$
-
-CREATE PROCEDURE sp_inserir_fornecedor(IN p_nome VARCHAR(100), IN p_cidade VARCHAR(100))
-BEGIN
-    INSERT INTO fornecedor (nome, cidade) VALUES (p_nome, p_cidade);
-END $$
-
-DELIMITER ;
-
--- Dados de teste
-INSERT INTO cliente (nome, email) VALUES
-('Ana Silva', 'ana@email.com'),
-('Carlos Souza', 'carlos@email.com');
-
-INSERT INTO fornecedor (nome, cidade) VALUES
-('Fornecedor A', 'Salto'),
-('Fornecedor B', 'Itu');
+-- O script não insere dados de demonstração nem apaga cadastros existentes.

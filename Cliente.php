@@ -1,41 +1,31 @@
 <?php
-require_once 'Conn.php';
+declare(strict_types=1);
+
+require_once __DIR__ . '/Conn.php';
 
 class Cliente
 {
-    private $id;
-    private $nome;
-    private $email;
+    private ?int $id = null;
+    private string $nome = '';
+    private string $email = '';
 
-    public function getId() { return $this->id; }
-    public function setId($id) { $this->id = $id; }
+    public function getId(): ?int { return $this->id; }
+    public function setId(?int $id): void { $this->id = $id; }
+    public function getNome(): string { return $this->nome; }
+    public function setNome(string $nome): void { $this->nome = trim($nome); }
+    public function getEmail(): string { return $this->email; }
+    public function setEmail(string $email): void { $this->email = trim($email); }
 
-    public function getNome() { return $this->nome; }
-    public function setNome($nome) { $this->nome = $nome; }
-
-    public function getEmail() { return $this->email; }
-    public function setEmail($email) { $this->email = $email; }
-
-    public function salvar()
+    public function salvar(): bool
     {
-        $conn = new Conn();
-        $pdo = $conn->conectar();
-
-        $sql = "INSERT INTO cliente(nome, email) VALUES (:nome, :email)";
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindValue(':nome', $this->nome);
-        $stmt->bindValue(':email', $this->email);
-
-        return $stmt->execute();
+        $pdo = (new Conn())->conectar();
+        $stmt = $pdo->prepare('INSERT INTO cliente (nome, email) VALUES (:nome, :email)');
+        return $stmt->execute(['nome' => $this->nome, 'email' => $this->email]);
     }
 
-    public static function listarTodos()
+    public static function listarTodos(): array
     {
-        $conn = new Conn();
-        $pdo = $conn->conectar();
-        $stmt = $pdo->prepare("SELECT id, nome, email FROM cliente ORDER BY id DESC");
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $pdo = (new Conn())->conectar();
+        return $pdo->query('SELECT id, nome, email FROM cliente ORDER BY id DESC')->fetchAll();
     }
 }
-?>

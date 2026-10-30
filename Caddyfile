@@ -1,0 +1,14 @@
+{
+    frankenphp
+    auto_https off
+}
+
+:{$PORT:80} {
+    root * /app
+    encode zstd gzip
+
+    @internal path /Conn.php /Cliente.php /Fornecedor.php /helpers.php /actions.php /rotas.php /navbar.php /views/* /Procedure.txt /README.md /.env /.env.*
+    respond @internal 404
+
+    php_server
+}

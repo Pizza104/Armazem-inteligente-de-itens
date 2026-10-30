@@ -1,5 +1,3 @@
-<div class="alert alert-primary" role="alert">
-    <h3>Listar categorias</h3>
-</div>
-
-<a href="?p=categoria/add" title="Add Categoria">+ Categoria</a>
+<?php
+header('Location: ../index.php?p=categorias', true, 302);
+exit;

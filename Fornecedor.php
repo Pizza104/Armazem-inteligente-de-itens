@@ -1,50 +1,31 @@
-<<<<<<< HEAD
 <?php
-require_once 'Conn.php';
+declare(strict_types=1);
 
-class Fornecedor{
+require_once __DIR__ . '/Conn.php';
 
-    private $id;
-    private $nome;
-    private $cidade;
+class Fornecedor
+{
+    private ?int $id = null;
+    private string $nome = '';
+    private string $cidade = '';
 
-    public function getId(){
-        return $this->id;
+    public function getId(): ?int { return $this->id; }
+    public function setId(?int $id): void { $this->id = $id; }
+    public function getNome(): string { return $this->nome; }
+    public function setNome(string $nome): void { $this->nome = trim($nome); }
+    public function getCidade(): string { return $this->cidade; }
+    public function setCidade(string $cidade): void { $this->cidade = trim($cidade); }
+
+    public function salvar(): bool
+    {
+        $pdo = (new Conn())->conectar();
+        $stmt = $pdo->prepare('INSERT INTO fornecedor (nome, cidade) VALUES (:nome, :cidade)');
+        return $stmt->execute(['nome' => $this->nome, 'cidade' => $this->cidade]);
     }
 
-    public function setId($id){
-        $this->id = $id;
-    }
-
-    public function getNome(){
-        return $this->nome;
-    }
-
-    public function setNome($nome){
-        $this->nome = $nome;
-    }
-
-    public function getCidade(){
-        return $this->cidade;
-    }
-
-    public function setCidade($cidade){
-        $this->cidade = $cidade;
-    }
-
-    public function salvar(){
-
-        $conn = new Conn();
-        $pdo = $conn->conectar();
-
-        $sql = "INSERT INTO fornecedor(nome,cidade)
-                VALUES(:nome,:cidade)";
-
-        $stmt = $pdo->prepare($sql);
-
-        $stmt->bindValue(':nome',$this->nome);
-        $stmt->bindValue(':cidade',$this->cidade);
-
-        return $stmt->execute();
+    public static function listarTodos(): array
+    {
+        $pdo = (new Conn())->conectar();
+        return $pdo->query('SELECT id, nome, cidade FROM fornecedor ORDER BY id DESC')->fetchAll();
     }
 }
